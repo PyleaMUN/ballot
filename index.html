@@ -187,7 +187,8 @@
         <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-purple-700 mb-6 drop-shadow-md">PyleaMUN Ballot Leaderboard</h1>
         <p class="text-center text-gray-600 mb-8 text-sm">Real-time voting results for the organizing committee.</p>
 
-        <div id="user-id-display" class="text-xs text-gray-500 text-center mb-4">
+        <!-- User ID Display - Now hidden -->
+        <div id="user-id-display" class="text-xs text-gray-500 text-center mb-4 hidden">
             Your User ID: <span id="current-user-id">Loading...</span>
         </div>
 
@@ -285,7 +286,8 @@
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUserId = user.uid;
-                document.getElementById('current-user-id').textContent = currentUserId;
+                // User ID is no longer displayed, but still useful for debugging in console
+                // document.getElementById('current-user-id').textContent = currentUserId; 
                 console.log("Leaderboard user signed in:", currentUserId);
                 // Start loading data once authenticated
                 loadLeaderboardData();
