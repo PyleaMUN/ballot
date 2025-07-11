@@ -11,7 +11,6 @@
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(to right bottom, #a78bfa, #fbcfe8); /* Playful gradient background */
-            /* Removed display: flex, justify-content, align-items, min-height to allow native scrolling */
             margin: 0;
             padding: 0; /* Remove padding from body to ensure app-container can take full height */
             box-sizing: border-box;
@@ -19,6 +18,9 @@
             height: 100vh; /* Ensure body takes full viewport height */
             overflow-y: auto; /* Make the body itself scrollable */
             -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            display: flex; /* Use flexbox for body content */
+            justify-content: center; /* Center horizontally */
+            align-items: flex-start; /* Align to top, allowing content to scroll down */
         }
         /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
@@ -177,7 +179,8 @@
             </label>
         </div>
 
-        <div id="profile-card" class="bg-gradient-to-br from-purple-100 to-pink-100 p-4 sm:p-6 rounded-2xl shadow-lg mb-8 transition-all duration-300 transform hover:rotate-1 hover:scale-102">
+        <!-- Profile card - Removed hover:rotate-1 for stability -->
+        <div id="profile-card" class="bg-gradient-to-br from-purple-100 to-pink-100 p-4 sm:p-6 rounded-2xl shadow-lg mb-8 transition-all duration-300 transform hover:scale-102">
             <!-- Profile image -->
             <img id="profile-image" src="https://placehold.co/300x300/e9d5ff/8b5cf6?text=Delegate" alt="Delegate Profile" class="w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-4 object-cover border-4 border-purple-300 shadow-md">
             
@@ -304,7 +307,7 @@
         const messageBox = document.getElementById('message-box');
         const genderFilterRadios = document.querySelectorAll('input[name="genderFilter"]');
 
-        // --- Swipe variables ---
+        // --- Swipe variables (removed event listeners from here) ---
         let touchStartX = 0;
         let touchEndX = 0;
         const SWIPE_THRESHOLD = 75; // Minimum pixels to register a swipe
@@ -554,47 +557,10 @@
             });
         });
 
-        // --- Swipe Event Listeners ---
-        profileCard.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-            // Optional: Add a class for visual feedback like 'active-swipe'
-            profileCard.style.transition = 'none'; // Disable transition during swipe
-        });
-
-        profileCard.addEventListener('touchmove', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            // Optional: Move the card slightly with the finger for visual feedback
-            const deltaX = touchEndX - touchStartX;
-            profileCard.style.transform = `translateX(${deltaX}px)`;
-            e.preventDefault(); // Prevent scrolling while swiping horizontally
-        });
-
-        profileCard.addEventListener('touchend', (e) => {
-            const deltaX = touchEndX - touchStartX;
-            profileCard.style.transition = 'all 0.3s ease-out'; // Re-enable transition
-            profileCard.style.transform = 'translateX(0)'; // Reset position
-
-            if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
-                if (deltaX < 0) {
-                    // Swiped left (Pass)
-                    showMessage("Swiped left (Pass)!", 'info');
-                    loadNextProfile();
-                } else {
-                    // Swiped right (Vote Best Delegate)
-                    // Only trigger if not already voted for Best Delegate
-                    const currentProfile = filteredProfiles[currentProfileIndex];
-                    if (currentProfile && !votedProfiles[currentProfile.id]?.bestDelegate) {
-                        handleVote('bestDelegate');
-                    } else {
-                        showMessage("Already voted Best Delegate or no profiles.", 'info');
-                        loadNextProfile(); // Still move to next if already voted or no profiles
-                    }
-                }
-            }
-            // Reset touch coordinates for next swipe
-            touchStartX = 0;
-            touchEndX = 0;
-        });
+        // --- Removed Swipe Event Listeners for stability ---
+        // profileCard.addEventListener('touchstart', ...);
+        // profileCard.addEventListener('touchmove', ...);
+        // profileCard.addEventListener('touchend', ...);
 
 
         /**
