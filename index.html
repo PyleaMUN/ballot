@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PyleaMUN Ballot</title>
+    <title>PyleaMUN Ballot - Leaderboard</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(to right bottom, #a78bfa, #fbcfe8); /* Playful gradient background */
+            background: linear-gradient(to right bottom, #8b5cf6, #fbcfe8); /* Committee-themed gradient */
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Align to top for longer content */
             min-height: 100vh;
             margin: 0;
-            padding: 10px; /* Reduced padding for very small screens */
+            padding: 20px;
             box-sizing: border-box;
-            overflow-x: hidden; /* Prevent horizontal scrolling during swipe */
+            color: #333;
         }
         /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
@@ -29,12 +29,11 @@
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb {
-            background: #a78bfa;
+            background: #8b5cf6;
             border-radius: 10px;
-            cursor: grab; /* Indicate it's draggable */
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #8b5cf6;
+            background: #6d28d9;
         }
 
         /* Styles for the loading overlay */
@@ -115,14 +114,63 @@
         .custom-alert-box button:hover {
             background-color: #8b5cf6; /* Purple-500 */
         }
+        .custom-alert-box input[type="password"] {
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            width: 80%;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
 
+        .leaderboard-card {
+            background-color: white;
+            border-radius: 1.5rem; /* rounded-3xl */
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* shadow-2xl */
+            padding: 1.5rem; /* p-6 */
+            width: 100%;
+            max-width: 768px; /* md:max-w-2xl */
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .leaderboard-section {
+            margin-bottom: 2rem;
+        }
+
+        .leaderboard-list li {
+            background-color: #f3f4f6; /* gray-100 */
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem; /* rounded-xl */
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            color: #4b5563; /* gray-700 */
+        }
+
+        .leaderboard-list li:nth-child(odd) {
+            background-color: #e5e7eb; /* gray-200 */
+        }
+
+        .leaderboard-list li span:first-child {
+            font-weight: 600;
+            color: #1f2937; /* gray-900 */
+        }
+
+        .leaderboard-list li span:last-child {
+            font-weight: bold;
+            color: #6d28d9; /* purple-700 */
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body class="selection:bg-purple-200 selection:text-purple-800">
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay hidden">
         <div class="loading-spinner"></div>
-        <p>Loading Profiles...</p>
+        <p>Loading Results...</p>
     </div>
 
     <!-- Custom Alert/Message Box HTML -->
@@ -130,65 +178,41 @@
         <div class="custom-alert-box">
             <h3 id="custom-alert-title"></h3>
             <p id="custom-alert-message"></p>
+            <input type="password" id="custom-alert-password" placeholder="Enter password (if required)" class="hidden">
             <button id="custom-alert-ok-button">OK</button>
         </div>
     </div>
 
-    <div class="app-container bg-white p-4 sm:p-8 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm transform transition-all duration-300 hover:scale-105">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-purple-700 mb-6 drop-shadow-md">PyleaMUN Ballot</h1>
-        <p class="text-center text-gray-600 mb-8 text-sm">Vote for your favorite delegates!</p>
+    <div class="leaderboard-card">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-purple-700 mb-6 drop-shadow-md">PyleaMUN Ballot Leaderboard</h1>
+        <p class="text-center text-gray-600 mb-8 text-sm">Real-time voting results for the organizing committee.</p>
 
-        <!-- Gender Filter -->
-        <div class="flex justify-center space-x-2 sm:space-x-4 mb-6 text-sm sm:text-base">
-            <label class="inline-flex items-center">
-                <input type="radio" name="genderFilter" value="all" checked class="form-radio text-purple-600 h-4 w-4 sm:h-5 sm:w-5">
-                <span class="ml-1 sm:ml-2 text-gray-700 font-medium">All</span>
-            </label>
-            <label class="inline-flex items-center">
-                <input type="radio" name="genderFilter" value="male" class="form-radio text-purple-600 h-4 w-4 sm:h-5 sm:w-5">
-                <span class="ml-1 sm:ml-2 text-gray-700 font-medium">Male</span>
-            </label>
-            <label class="inline-flex items-center">
-                <input type="radio" name="genderFilter" value="female" class="form-radio text-purple-600 h-4 w-4 sm:h-5 sm:w-5">
-                <span class="ml-1 sm:ml-2 text-gray-700 font-medium">Female</span>
-            </label>
+        <div id="user-id-display" class="text-xs text-gray-500 text-center mb-4">
+            Your User ID: <span id="current-user-id">Loading...</span>
         </div>
 
-        <div id="profile-card" class="bg-gradient-to-br from-purple-100 to-pink-100 p-4 sm:p-6 rounded-2xl shadow-lg mb-8 transition-all duration-300 transform hover:rotate-1 hover:scale-102">
-            <!-- Profile image -->
-            <img id="profile-image" src="https://placehold.co/300x300/e9d5ff/8b5cf6?text=Delegate" alt="Delegate Profile" class="w-28 h-28 sm:w-32 sm:h-32 rounded-full mx-auto mb-4 object-cover border-4 border-purple-300 shadow-md">
-            
-            <!-- Profile name and age -->
-            <h2 id="profile-name" class="text-2xl sm:text-3xl font-bold text-center text-purple-800 mb-2"></h2>
-            <p id="profile-age" class="text-base sm:text-lg text-center text-gray-700 mb-2"></p>
-            <p id="profile-committee" class="text-sm sm:text-base text-center text-gray-700 mb-1"></p>
-            <p id="profile-post" class="text-sm sm:text-base text-center text-gray-700 mb-4"></p>
-            
-            <!-- Profile bio/interests -->
-            <p id="profile-bio" class="text-sm sm:text-md text-center text-gray-800 leading-relaxed"></p>
+        <!-- Best Delegate Leaderboard -->
+        <div class="leaderboard-section">
+            <h2 class="text-2xl font-bold text-purple-600 mb-4 text-center">🏆 Best Delegate (Delegate's Choice)</h2>
+            <ul id="best-delegate-list" class="leaderboard-list">
+                <!-- Results will be dynamically inserted here -->
+                <li class="text-gray-500 text-center">Loading results...</li>
+            </ul>
         </div>
 
-        <div class="flex flex-col space-y-4 sm:space-y-2 sm:flex-row sm:justify-around sm:space-x-4 mb-6">
-            <!-- Vote Best Delegate button -->
-            <button id="vote-best-delegate-button" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full shadow-lg transition-all duration-200 transform hover:-translate-y-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
-                <span class="text-xl sm:text-2xl">🏆</span> Best Delegate (Delegate's Choice)
+        <!-- Mr./Ms. Congeniality Leaderboard -->
+        <div class="leaderboard-section">
+            <h2 class="text-2xl font-bold text-yellow-600 mb-4 text-center">✨ Mr./Ms. Congeniality</h2>
+            <ul id="congeniality-list" class="leaderboard-list">
+                <!-- Results will be dynamically inserted here -->
+                <li class="text-gray-500 text-center">Loading results...</li>
+            </ul>
+        </div>
+
+        <div class="flex justify-center mt-8">
+            <button id="reset-data-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-200 transform hover:-translate-y-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75">
+                Reset All Data (Admin)
             </button>
-            <!-- Vote Congeniality button -->
-            <button id="vote-congeniality-button" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full shadow-lg transition-all duration-200 transform hover:-translate-y-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-75">
-                <span class="text-xl sm:text-2xl">✨</span> Mr./Ms. Congeniality
-            </button>
-        </div>
-
-        <!-- Next Profile Button -->
-        <div class="flex justify-center mb-6">
-            <button id="next-profile-button" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all duration-200 transform hover:-translate-y-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-75">
-                Next Profile <span class="text-xl">➡️</span>
-            </button>
-        </div>
-
-        <!-- Message box for matches/disclaimers -->
-        <div id="message-box" class="bg-purple-50 text-purple-700 p-3 sm:p-4 rounded-xl text-center text-xs sm:text-sm font-medium shadow-inner hidden">
-            <!-- Messages will appear here -->
         </div>
     </div>
 
@@ -196,11 +220,11 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, collectionGroup, query, onSnapshot, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Your web app's Firebase configuration (PASTE YOUR SNIPPET HERE)
         const firebaseConfig = {
-            apiKey: "AIzaSyC3lYcRp_szMeI4AAeJHSK1UE68MfbMdyY", // Corrected API Key
+            apiKey: "AIzaSyC3lYcRp_szMeI4AAeJHSK1UE68MfbMdyY", // Replace with your actual API Key
             authDomain: "pyleamun-voting-app.firebaseapp.com",
             projectId: "pyleamun-voting-app",
             storageBucket: "pyleamun-voting-app.firebasestorage.app",
@@ -214,11 +238,14 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Global variable to store the current user's UID
+        // Global variable to store the current user's UID for display
         let currentUserId = null;
 
-        // All delegate profiles fetched from Firestore
-        let allDelegates = [];
+        // Map to store delegate profiles fetched from Firestore
+        let profileIdToNameMap = new Map();
+
+        // Admin password for reset functionality (CHANGE THIS TO A SECURE PASSWORD!)
+        const ADMIN_PASSWORD = "@@Pylea@@26"; // !!! IMPORTANT: CHANGE THIS IN PRODUCTION !!!
 
         // --- UI Utility Functions ---
         function showLoading(message = "Loading...") {
@@ -230,68 +257,58 @@
             document.getElementById('loading-overlay').classList.add('hidden');
         }
 
-        function showAlert(title, message) {
+        // Modified showAlert to include password input
+        function showAlert(title, message, type = 'info', callback = null) {
             document.getElementById('custom-alert-title').textContent = title;
             document.getElementById('custom-alert-message').textContent = message;
+            const passwordInput = document.getElementById('custom-alert-password');
+            const okButton = document.getElementById('custom-alert-ok-button');
+
+            if (type === 'password_prompt') {
+                passwordInput.value = ''; // Clear previous input
+                passwordInput.classList.remove('hidden');
+                okButton.textContent = "Confirm";
+            } else {
+                passwordInput.classList.add('hidden');
+                okButton.textContent = "OK";
+            }
+
             document.getElementById('custom-alert-overlay').classList.remove('hidden');
+            
+            okButton.onclick = () => {
+                document.getElementById('custom-alert-overlay').classList.add('hidden');
+                if (callback) callback(passwordInput.value); // Pass password value to callback
+            };
         }
 
-        document.getElementById('custom-alert-ok-button').addEventListener('click', () => {
-            document.getElementById('custom-alert-overlay').classList.add('hidden');
-        });
-
-        // --- Firebase Authentication ---
+        // --- Firebase Authentication for Leaderboard ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                // User is signed in (either new anonymous or existing)
                 currentUserId = user.uid;
-                console.log("User signed in:", currentUserId);
-                // Now that we have a user, we can load profiles
-                loadProfilesAndDisplayFirst();
+                document.getElementById('current-user-id').textContent = currentUserId;
+                console.log("Leaderboard user signed in:", currentUserId);
+                // Start loading data once authenticated
+                loadLeaderboardData();
             } else {
-                // User is signed out, sign in anonymously
-                console.log("No user signed in. Signing in anonymously...");
+                console.log("No user signed in on leaderboard. Signing in anonymously...");
                 signInAnonymously(auth)
                     .then(() => {
-                        console.log("Anonymous sign-in successful.");
+                        console.log("Anonymous sign-in successful for leaderboard.");
+                        // onAuthStateChanged will trigger again with the new user
                     })
                     .catch((error) => {
-                        console.error("Anonymous sign-in failed:", error);
-                        showAlert("Authentication Error", "Could not sign you in. Please try again.");
+                        console.error("Anonymous sign-in failed for leaderboard:", error);
+                        showAlert("Authentication Error", "Could not sign you in to view results. Please try again.");
                     });
             }
         });
 
-        let currentProfileIndex = 0; // Tracks the current index within the *filtered* profiles
-        let filteredProfiles = []; // Stores profiles based on the current gender filter
-        let currentFilterGender = 'all'; // Default filter
-        let votedProfiles = {}; // Stores voted profiles for the current user: {profileId: {bestDelegate: true, congeniality: false}}
-
-        // Get DOM elements
-        const profileCard = document.getElementById('profile-card'); // Get the profile card for swipe
-        const profileImage = document.getElementById('profile-image');
-        const profileName = document.getElementById('profile-name');
-        const profileAge = document.getElementById('profile-age');
-        const profileCommittee = document.getElementById('profile-committee');
-        const profilePost = document.getElementById('profile-post');
-        const profileBio = document.getElementById('profile-bio');
-        const voteBestDelegateButton = document.getElementById('vote-best-delegate-button');
-        const voteCongenialityButton = document.getElementById('vote-congeniality-button');
-        const nextProfileButton = document.getElementById('next-profile-button'); // New Next button
-        const messageBox = document.getElementById('message-box');
-        const genderFilterRadios = document.querySelectorAll('input[name="genderFilter"]');
-
-        // --- Swipe variables ---
-        let touchStartX = 0;
-        let touchEndX = 0;
-        const SWIPE_THRESHOLD = 75; // Minimum pixels to register a swipe
-
         /**
-         * Fetches all delegate profiles from Firestore.
+         * Fetches all delegate profiles from Firestore and populates the map.
          */
-        async function fetchAllDelegates() {
+        async function fetchDelegateProfiles() {
             showLoading("Fetching delegate profiles...");
-            allDelegates = []; // Clear previous delegates
+            profileIdToNameMap = new Map(); // Clear previous map
             try {
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                 // Corrected path to include 'data' document to make segments odd
@@ -299,287 +316,156 @@
                 const querySnapshot = await getDocs(delegatesCollectionRef);
 
                 querySnapshot.forEach((doc) => {
-                    allDelegates.push(doc.data());
+                    const data = doc.data();
+                    profileIdToNameMap.set(data.id, `${data.name} ${data.surname}`);
                 });
-                console.log("Fetched delegates:", allDelegates);
+                console.log("Fetched delegate names:", profileIdToNameMap);
             } catch (error) {
-                console.error("Error fetching delegates:", error);
-                showAlert("Error", "Could not load delegate profiles. Please ensure rules are correct.");
+                console.error("Error fetching delegate profiles for leaderboard:", error);
+                showAlert("Error", "Could not load delegate names. Check console for details.");
             } finally {
-                hideLoading();
+                // Keep loading visible until votes are also fetched
             }
         }
 
         /**
-         * Filters the main profiles array based on the selected gender.
+         * Listens for real-time updates to all vote documents in Firestore
+         * and updates the leaderboard.
          */
-        function applyGenderFilter() {
-            if (allDelegates.length === 0) {
-                filteredProfiles = [];
-            } else if (currentFilterGender === 'all') {
-                filteredProfiles = [...allDelegates]; // Use fetched delegates
-            } else {
-                filteredProfiles = allDelegates.filter(profile => profile.gender === currentFilterGender);
-            }
-            currentProfileIndex = 0; // Reset index when filter changes
-            loadNextProfile(); // Load the first profile of the new filtered list
-        }
+        function listenForVotes() {
+            showLoading("Loading votes...");
+            // Ensure __app_id is defined. If running outside Canvas, provide a fallback.
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            
+            // Query all 'votes' subcollections across all users
+            // This requires a Collection Group Index on 'votes' (see instructions below)
+            const votesCollectionGroupRef = collectionGroup(db, 'votes');
+            const q = query(votesCollectionGroupRef);
 
-        /**
-         * Displays a given profile's details on the card.
-         * @param {object} profile - The profile object to display.
-         */
-        function displayProfile(profile) {
-            if (!profile) {
-                profileImage.src = "https://placehold.co/300x300/cccccc/666666?text=No+Profiles";
-                profileImage.alt = "No profiles available";
-                profileName.textContent = "No More Profiles!";
-                profileAge.textContent = "";
-                profileCommittee.textContent = "";
-                profilePost.textContent = "";
-                profileBio.textContent = "No delegates found. Nominate someone or try changing your filter.";
-                voteBestDelegateButton.disabled = true;
-                voteCongenialityButton.disabled = true;
-                nextProfileButton.disabled = true; // Disable next button too
-                return;
-            }
-            profileImage.src = profile.image;
-            profileImage.alt = `${profile.name} Profile`;
-            profileName.textContent = `${profile.name} ${profile.surname}`;
-            profileAge.textContent = `${profile.age} years old`;
-            profileCommittee.textContent = `Committee: ${profile.committee || 'N/A'}`; // Display N/A if blank
-            profilePost.textContent = `Post: ${profile.post}`;
-            profileBio.textContent = `Interests: ${profile.interests}`;
-
-            // Check if the current user has already voted for this profile
-            updateVoteButtonStates(profile.id);
-            nextProfileButton.disabled = false; // Enable next button if profiles exist
-        }
-
-        /**
-         * Updates the state of the vote buttons based on whether the current user has already voted for the displayed profile.
-         * @param {string} profileId - The ID of the currently displayed profile.
-         */
-        function updateVoteButtonStates(profileId) {
-            const hasVotedBestDelegate = votedProfiles[profileId]?.bestDelegate || false;
-            const hasVotedCongeniality = votedProfiles[profileId]?.congeniality || false;
-
-            voteBestDelegateButton.disabled = hasVotedBestDelegate;
-            voteCongenialityButton.disabled = hasVotedCongeniality;
-
-            // Optional: Change button appearance if already voted
-            voteBestDelegateButton.classList.toggle('opacity-50', hasVotedBestDelegate);
-            voteCongenialityButton.classList.toggle('opacity-50', hasVotedCongeniality);
-        }
-
-        /**
-         * Shows a temporary message in the message box.
-         * @param {string} message - The message to display.
-         * @param {string} type - 'success' or 'info' to determine styling.
-         */
-        function showMessage(message, type = 'info') {
-            messageBox.textContent = message;
-            messageBox.classList.remove('hidden', 'bg-purple-50', 'text-purple-700', 'bg-green-50', 'text-green-700');
-            if (type === 'success') {
-                messageBox.classList.add('bg-green-50', 'text-green-700');
-            } else {
-                messageBox.classList.add('bg-purple-50', 'text-purple-700');
-            }
-            messageBox.style.opacity = '0'; // Start faded out
-            messageBox.style.transform = 'translateY(10px)'; // Start slightly below
-            messageBox.classList.remove('opacity-0', 'translate-y-10'); // Ensure classes are removed for animation
-            setTimeout(() => {
-                messageBox.style.transition = 'opacity 0.5s ease-out, transform 0.5s ease-out';
-                messageBox.style.opacity = '1';
-                messageBox.style.transform = 'translateY(0)';
-            }, 10); // Small delay to ensure transition applies
-
-            // Hide message after a few seconds
-            setTimeout(() => {
-                messageBox.style.opacity = '0';
-                messageBox.style.transform = 'translateY(10px)';
-                setTimeout(() => {
-                    messageBox.classList.add('hidden');
-                }, 500); // Hide completely after transition
-            }, 3000); // Message visible for 3 seconds
-        }
-
-        /**
-         * Loads the next profile in the *filtered* array.
-         * If all profiles are shown, it loops back to the beginning.
-         */
-        function loadNextProfile() {
-            if (filteredProfiles.length === 0) {
-                displayProfile(null); // Show "No profiles" state
-                return;
-            }
-            currentProfileIndex = (currentProfileIndex + 1) % filteredProfiles.length;
-            displayProfile(filteredProfiles[currentProfileIndex]);
-        }
-
-        /**
-         * Fetches existing votes for the current user from Firestore.
-         * This prevents a user from voting multiple times for the same candidate/category.
-         */
-        async function fetchUserVotes() {
-            if (!currentUserId) {
-                console.warn("User ID not available to fetch votes.");
-                return;
-            }
-            showLoading("Loading your previous votes...");
-            votedProfiles = {}; // Reset previous votes
-            try {
-                // Ensure __app_id is defined. If running outside Canvas, provide a fallback.
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                const votesCollectionRef = collection(db, `artifacts/${appId}/users/${currentUserId}/votes`);
-                const q = query(votesCollectionRef);
-                const querySnapshot = await getDocs(q);
+            // Set up real-time listener
+            onSnapshot(q, (querySnapshot) => {
+                const bestDelegateVotes = {};
+                const congenialityVotes = {};
 
                 querySnapshot.forEach((doc) => {
                     const voteData = doc.data();
                     const candidateId = voteData.candidateId;
                     const voteType = voteData.voteType;
 
-                    if (!votedProfiles[candidateId]) {
-                        votedProfiles[candidateId] = {};
+                    if (voteType === 'bestDelegate') {
+                        bestDelegateVotes[candidateId] = (bestDelegateVotes[candidateId] || 0) + 1;
+                    } else if (voteType === 'congeniality') {
+                        congenialityVotes[candidateId] = (congenialityVotes[candidateId] || 0) + 1;
                     }
-                    votedProfiles[candidateId][voteType] = true;
-                });
-                console.log("Fetched user votes:", votedProfiles);
-            } catch (error) {
-                console.error("Error fetching user votes:", error);
-                showAlert("Error", "Could not load your previous votes.");
-            } finally {
-                hideLoading();
-            }
-        }
-
-        /**
-         * Handles voting for a candidate.
-         * @param {string} voteType - 'bestDelegate' or 'congeniality'.
-         */
-        async function handleVote(voteType) {
-            if (!currentUserId) {
-                showAlert("Error", "Please wait, user authentication is not ready.");
-                return;
-            }
-            if (filteredProfiles.length === 0) {
-                showAlert("No Profiles", "There are no profiles to vote for.");
-                return;
-            }
-
-            const currentProfile = filteredProfiles[currentProfileIndex];
-            if (!currentProfile) {
-                showAlert("Error", "No profile selected for voting.");
-                return;
-            }
-
-            // Check if already voted for this profile and type
-            if (votedProfiles[currentProfile.id]?.[voteType]) {
-                showMessage(`You already voted for ${currentProfile.name} as ${voteType === 'bestDelegate' ? 'Best Delegate (Delegate\'s Choice)' : 'Mr./Ms. Congeniality'}!`, 'info');
-                loadNextProfile(); // Move to next profile
-                return;
-            }
-
-            showLoading("Recording vote...");
-            try {
-                // Ensure __app_id is defined. If running outside Canvas, provide a fallback.
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                // Record the vote in the user's private collection
-                const userVotesCollectionRef = collection(db, `artifacts/${appId}/users/${currentUserId}/votes`);
-                await addDoc(userVotesCollectionRef, {
-                    candidateId: currentProfile.id,
-                    voteType: voteType,
-                    timestamp: new Date(),
-                    voterId: currentUserId // Redundant but good for clarity
                 });
 
-                // Mark as voted in local state
-                if (!votedProfiles[currentProfile.id]) {
-                    votedProfiles[currentProfile.id] = {};
-                }
-                votedProfiles[currentProfile.id][voteType] = true;
-
-                showMessage(`Your vote for ${currentProfile.name} as ${voteType === 'bestDelegate' ? 'Best Delegate (Delegate\'s Choice)' : 'Mr./Ms. Congeniality'} has been recorded!`, 'success');
-                updateVoteButtonStates(currentProfile.id); // Update buttons immediately
-                loadNextProfile(); // Move to the next profile
-            } catch (error) {
-                console.error("Error casting vote:", error);
-                showAlert("Vote Failed", "There was an error recording your vote. Please try again.");
-            } finally {
+                updateLeaderboardDisplay('best-delegate-list', bestDelegateVotes);
+                updateLeaderboardDisplay('congeniality-list', congenialityVotes);
+                hideLoading(); // Hide loading after both profiles and votes are processed
+            }, (error) => {
+                console.error("Error listening for votes:", error);
+                showAlert("Error", "Could not load real-time results. Check console for details.");
                 hideLoading();
-            }
-        }
-
-        // Event listeners for the vote buttons
-        voteBestDelegateButton.addEventListener('click', () => handleVote('bestDelegate'));
-        voteCongenialityButton.addEventListener('click', () => handleVote('congeniality'));
-        nextProfileButton.addEventListener('click', () => loadNextProfile()); // Event listener for the new Next button
-
-        // Event listeners for gender filter radio buttons
-        genderFilterRadios.forEach(radio => {
-            radio.addEventListener('change', (event) => {
-                currentFilterGender = event.target.value;
-                applyGenderFilter();
             });
-        });
-
-        // --- Swipe Event Listeners ---
-        profileCard.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-            // Optional: Add a class for visual feedback like 'active-swipe'
-            profileCard.style.transition = 'none'; // Disable transition during swipe
-        });
-
-        profileCard.addEventListener('touchmove', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            // Optional: Move the card slightly with the finger for visual feedback
-            const deltaX = touchEndX - touchStartX;
-            profileCard.style.transform = `translateX(${deltaX}px)`;
-            e.preventDefault(); // Prevent scrolling while swiping horizontally
-        });
-
-        profileCard.addEventListener('touchend', (e) => {
-            const deltaX = touchEndX - touchStartX;
-            profileCard.style.transition = 'all 0.3s ease-out'; // Re-enable transition
-            profileCard.style.transform = 'translateX(0)'; // Reset position
-
-            if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
-                if (deltaX < 0) {
-                    // Swiped left (Pass)
-                    showMessage("Swiped left (Pass)!", 'info');
-                    loadNextProfile();
-                } else {
-                    // Swiped right (Vote Best Delegate)
-                    // Only trigger if not already voted for Best Delegate
-                    const currentProfile = filteredProfiles[currentProfileIndex];
-                    if (currentProfile && !votedProfiles[currentProfile.id]?.bestDelegate) {
-                        handleVote('bestDelegate');
-                    } else {
-                        showMessage("Already voted Best Delegate or no profiles.", 'info');
-                        loadNextProfile(); // Still move to next if already voted or no profiles
-                    }
-                }
-            }
-            // Reset touch coordinates for next swipe
-            touchStartX = 0;
-            touchEndX = 0;
-        });
-
+        }
 
         /**
-         * Initial load function called after Firebase Auth is ready.
+         * Updates the HTML list for a given leaderboard category.
+         * @param {string} listId - The ID of the <ul> element.
+         * @param {object} votes - An object mapping candidateId to vote count.
          */
-        async function loadProfilesAndDisplayFirst() {
-            await fetchAllDelegates(); // Fetch all delegates from Firestore
-            await fetchUserVotes(); // Fetch user's previous votes
-            applyGenderFilter(); // Apply initial filter and display first profile
+        function updateLeaderboardDisplay(listId, votes) {
+            const listElement = document.getElementById(listId);
+            listElement.innerHTML = ''; // Clear previous results
+
+            const sortedCandidates = Object.entries(votes).sort(([, countA], [, countB]) => countB - countA);
+
+            if (sortedCandidates.length === 0) {
+                listElement.innerHTML = '<li class="text-gray-500 text-center">No votes cast yet.</li>';
+                return;
+            }
+
+            sortedCandidates.forEach(([candidateId, count]) => {
+                const listItem = document.createElement('li');
+                // Use the dynamically fetched name
+                const candidateName = profileIdToNameMap.get(candidateId) || `Unknown Delegate (${candidateId})`;
+                listItem.innerHTML = `<span>${candidateName}</span><span>${count} votes</span>`;
+                listElement.appendChild(listItem);
+            });
         }
+
+        /**
+         * Main function to load all necessary data for the leaderboard.
+         */
+        async function loadLeaderboardData() {
+            await fetchDelegateProfiles(); // First, get all delegate names
+            listenForVotes(); // Then, start listening for votes
+        }
+
+        // --- Reset Data Functionality ---
+        document.getElementById('reset-data-button').addEventListener('click', () => {
+            showAlert(
+                "Confirm Reset",
+                "Are you sure you want to delete ALL delegate nominations and votes? This action cannot be undone. Enter admin password to confirm.",
+                'password_prompt',
+                async (password) => {
+                    if (password === ADMIN_PASSWORD) {
+                        await resetAllData();
+                    } else {
+                        showAlert("Access Denied", "Incorrect password. Data reset cancelled.");
+                    }
+                }
+            );
+        });
+
+        async function resetAllData() {
+            showLoading("Deleting all data...");
+            try {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+                // 1. Delete all delegate profiles
+                const delegatesCollectionRef = collection(db, `artifacts/${appId}/public/data/delegates`);
+                const delegateDocs = await getDocs(delegatesCollectionRef);
+                const deleteDelegatePromises = [];
+                delegateDocs.forEach((docItem) => {
+                    deleteDelegatePromises.push(deleteDoc(doc(db, `artifacts/${appId}/public/data/delegates`, docItem.id)));
+                });
+                await Promise.all(deleteDelegatePromises);
+                console.log("All delegate profiles deleted.");
+
+                // 2. Delete all vote documents (from all user subcollections)
+                // This requires iterating through users and their vote subcollections
+                // For simplicity and to avoid complex backend functions, we'll fetch all votes
+                // and delete them one by one. For very large datasets, a Cloud Function
+                // would be more efficient for mass deletion.
+                const votesCollectionGroupRef = collectionGroup(db, 'votes');
+                const voteDocs = await getDocs(votesCollectionGroupRef);
+                const deleteVotePromises = [];
+                voteDocs.forEach((docItem) => {
+                    // Reconstruct the full path for deletion
+                    // docItem.ref.path gives the full path, e.g., artifacts/app_id/users/user_id/votes/vote_id
+                    deleteVotePromises.push(deleteDoc(doc(db, docItem.ref.path)));
+                });
+                await Promise.all(deleteVotePromises);
+                console.log("All vote records deleted.");
+
+                showAlert("Success!", "All delegate nominations and votes have been cleared.", () => {
+                    // Reload the page to reflect the empty state
+                    window.location.reload();
+                });
+
+            } catch (error) {
+                console.error("Error resetting data:", error);
+                showAlert("Error", "Failed to reset data. Check console for details and ensure security rules allow deletion.");
+            } finally {
+                hideLoading();
+            }
+        }
+
 
         // Initial setup when the DOM is fully loaded.
-        // The actual profile loading will wait for onAuthStateChanged to complete.
         document.addEventListener('DOMContentLoaded', () => {
-            // The onAuthStateChanged listener will handle calling loadProfilesAndDisplayFirst
+            // Authentication listener will trigger `loadLeaderboardData`
         });
     </script>
 </body>
