@@ -197,7 +197,7 @@
         <div class="flex flex-col space-y-4 sm:space-y-2 sm:flex-row sm:justify-around sm:space-x-4 mb-6">
             <!-- Vote Best Delegate button -->
             <button id="vote-best-delegate-button" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full shadow-lg transition-all duration-200 transform hover:-translate-y-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
-                <span class="text-xl sm:text-2xl">🏆</span> Best Delegate (Delegate's Choice)
+                <span class="text-xl sm:text-2xl">🏆</span> Top Persona (Delegates' Choice Award)
             </button>
             <!-- Vote Congeniality button -->
             <button id="vote-congeniality-button" class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 sm:py-3 sm:px-6 rounded-full shadow-lg transition-all duration-200 transform hover:-translate-y-1 active:scale-95 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-opacity-75">
@@ -497,13 +497,6 @@
             const currentProfile = filteredProfiles[currentProfileIndex];
             if (!currentProfile) {
                 showAlert("Error", "No profile selected for voting.");
-                return;
-            }
-
-            // Check if the current profile is a Student Officer or Executive
-            if (currentProfile.post === 'Student Officer' || currentProfile.post === 'Executive') {
-                showAlert("Cannot Vote", `You cannot vote for ${currentProfile.post}s in this category.`);
-                loadNextProfile(); // Move to next profile
                 return;
             }
 
