@@ -11,14 +11,14 @@
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(to right bottom, #a78bfa, #fbcfe8); /* Playful gradient background */
-            display: flex;
-            justify-content: center;
-            align-items: center; /* Center vertically if content is shorter than screen */
-            min-height: 100vh; /* Ensure body takes full viewport height */
+            /* Removed display: flex, justify-content, align-items, min-height to allow native scrolling */
             margin: 0;
-            padding: 10px; /* Add back padding to body for overall spacing */
+            padding: 0; /* Remove padding from body to ensure app-container can take full height */
             box-sizing: border-box;
             overflow-x: hidden; /* Prevent horizontal scrolling during swipe */
+            height: 100vh; /* Ensure body takes full viewport height */
+            overflow-y: auto; /* Make the body itself scrollable */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
         /* Custom scrollbar for better aesthetics */
         ::-webkit-scrollbar {
@@ -116,14 +116,10 @@
             background-color: #8b5cf6; /* Purple-500 */
         }
 
-        /* Revised CSS for the app-container to handle scrolling */
-        .app-container-scrollable {
-            /* Use flex-grow to allow it to take available space */
-            flex-grow: 1; 
-            max-height: calc(100vh - 20px); /* Account for body padding */
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-            padding-bottom: 20px; /* Add extra padding at the bottom for content visibility */
+        /* Adjusted app-container to be centered within the scrollable body */
+        .app-container {
+            margin: 20px auto; /* Add vertical margin and center horizontally */
+            /* Removed max-height and overflow-y from here, body handles it now */
         }
 
         /* Adjust font size for vote buttons */
@@ -160,8 +156,8 @@
         </div>
     </div>
 
-    <!-- Added app-container-scrollable class to the main container -->
-    <div class="app-container bg-white p-4 sm:p-8 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm transform transition-all duration-300 hover:scale-105 app-container-scrollable">
+    <!-- Removed app-container-scrollable class; app-container now relies on body for scrolling -->
+    <div class="app-container bg-white p-4 sm:p-8 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm transform transition-all duration-300 hover:scale-105">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-purple-700 mb-6 drop-shadow-md">PyleaMUN Ballot</h1>
         <p class="text-center text-gray-600 mb-8 text-sm">Vote for your favorite delegates!</p>
 
