@@ -122,7 +122,7 @@
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay hidden">
         <div class="loading-spinner"></div>
-        <p>Loading...</p>
+        <p>Loading Profiles...</p>
     </div>
 
     <!-- Custom Alert/Message Box HTML -->
@@ -202,7 +202,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyC3lYcRp_szMeI4AAeJHSK1UE68MfbMdyY", // Corrected API Key
             authDomain: "pyleamun-voting-app.firebaseapp.com",
-            projectId: "pyleamun-voting-voting-app",
+            projectId: "pyleamun-voting-app",
             storageBucket: "pyleamun-voting-app.firebasestorage.app",
             messagingSenderId: "519620537793",
             appId: "1:519620537793:web:d20dda66fded4c18e11340",
@@ -217,8 +217,12 @@
         // Global variable to store the current user's UID
         let currentUserId = null;
 
+        // All delegate profiles fetched from Firestore
+        let allDelegates = [];
+
         // --- UI Utility Functions ---
-        function showLoading() {
+        function showLoading(message = "Loading...") {
+            document.getElementById('loading-overlay').querySelector('p').textContent = message;
             document.getElementById('loading-overlay').classList.remove('hidden');
         }
 
@@ -258,185 +262,7 @@
             }
         });
 
-        // Array of mock delegate profiles with new fields
-        const profiles = [
-            {
-                id: "nikolaos-k", // Unique ID for Firebase document
-                name: "Nikolaos",
-                surname: "Karas",
-                age: 16,
-                gender: "male",
-                committee: "UN Security Council",
-                post: "Delegate",
-                interests: "International relations, Ancient history, Debating",
-                image: "https://placehold.co/300x300/a78bfa/ffffff?text=Nikolaos"
-            },
-            {
-                id: "eleni-p",
-                name: "Eleni",
-                surname: "Papadopoulou",
-                age: 15,
-                gender: "female",
-                committee: "Human Rights Council",
-                post: "Delegate",
-                interests: "Literature, Art, Thoughtful discussions",
-                image: "https://placehold.co/300x300/fbcfe8/8b5cf6?text=Eleni"
-            },
-            {
-                id: "dimitris-g",
-                name: "Dimitris",
-                surname: "Georgiou",
-                age: 17,
-                gender: "male",
-                committee: "Economic and Social Council",
-                post: "Student Officer",
-                interests: "Economics, Technology, Problem-solving, Sci-fi",
-                image: "https://placehold.co/300x300/d8b4fe/ffffff?text=Dimitris"
-            },
-            {
-                id: "sophia-a",
-                name: "Sophia",
-                surname: "Alexiou",
-                age: 14,
-                gender: "female",
-                committee: "General Assembly 1",
-                post: "Delegate",
-                interests: "Music, Photography, Cultures, Learning MUN",
-                image: "https://placehold.co/300x300/f0abfc/8b5cf6?text=Sophia"
-            },
-            {
-                id: "konstantinos-v",
-                name: "Konstantinos",
-                surname: "Vasileiou",
-                age: 18,
-                gender: "male",
-                committee: "Environmental Programme",
-                post: "Delegate",
-                interests: "Environmental policy, Hiking, Chess",
-                image: "https://placehold.co/300x300/c4b5fd/ffffff?text=Konstantinos"
-            },
-            {
-                id: "maria-k",
-                name: "Maria",
-                surname: "Koutsogianni",
-                age: 16,
-                gender: "female",
-                committee: "UN Security Council",
-                post: "Delegate",
-                interests: "Social justice, Languages, Global issues, Reading",
-                image: "https://placehold.co/300x300/fbcfe8/8b5cf6?text=Maria"
-            },
-            {
-                id: "giorgos-s",
-                name: "Giorgos",
-                surname: "Stergiou",
-                age: 17,
-                gender: "male",
-                committee: "Historical Committee",
-                post: "Delegate",
-                interests: "History, Philosophy, Debates, Ancient Greece",
-                image: "https://placehold.co/300x300/a78bfa/ffffff?text=Giorgos"
-            },
-            {
-                id: "katerina-m",
-                name: "Katerina",
-                surname: "Mavrou",
-                age: 15,
-                gender: "female",
-                committee: "Science and Technology Committee",
-                post: "Delegate",
-                interests: "Science, Innovation, Coding, Building",
-                image: "https://placehold.co/300x300/fbcfe8/8b5cf6?text=Katerina"
-            },
-            {
-                id: "panagiotis-l",
-                name: "Panagiotis",
-                surname: "Lazaridis",
-                age: 18,
-                gender: "male",
-                committee: "Political Committee",
-                post: "Student Officer",
-                interests: "Political science, Current events, Sports, Challenges",
-                image: "https://placehold.co/300x300/d8b4fe/ffffff?text=Panagiotis"
-            },
-            {
-                id: "despoina-r",
-                name: "Despoina",
-                surname: "Rapti",
-                age: 14,
-                gender: "female",
-                committee: "Cultural Committee",
-                post: "Delegate",
-                interests: "Writing, Drama, Role-play, Storytelling",
-                image: "https://placehold.co/300x300/f0abfc/8b5cf6?text=Despoina"
-            },
-            {
-                id: "vangelis-k",
-                name: "Vangelis",
-                surname: "Kontos",
-                age: 15,
-                gender: "male",
-                committee: "Disarmament and International Security Committee",
-                post: "Delegate",
-                interests: "Current affairs, Debating, Learning new things",
-                image: "https://placehold.co/300x300/a78bfa/ffffff?text=Vangelis"
-            },
-            {
-                id: "nickolas-s",
-                name: "Nickolas",
-                surname: "Stefanou",
-                age: 15,
-                gender: "male",
-                committee: "Special Political and Decolonization Committee",
-                post: "Delegate",
-                interests: "New technologies, Strategy games, Tech innovation",
-                image: "https://placehold.co/300x300/d8b4fe/ffffff?text=Nickolas"
-            },
-            {
-                id: "lydia-p",
-                name: "Lydia",
-                surname: "Petrou",
-                age: 16,
-                gender: "female",
-                committee: "Economic and Financial Committee",
-                post: "Delegate",
-                interests: "Environmental sustainability, Nature, Outdoor activities",
-                image: "https://placehold.co/300x300/fbcfe8/8b5cf6?text=Lydia"
-            },
-            {
-                id: "eleftheria-g",
-                name: "Eleftheria",
-                surname: "Georgiadou",
-                age: 16,
-                gender: "female",
-                committee: "Social, Humanitarian & Cultural Committee",
-                post: "Delegate",
-                interests: "Human rights, Social justice, Reading, Meaningful discussions",
-                image: "https://placehold.co/300x300/f0abfc/8b5cf6?text=Eleftheria"
-            },
-            {
-                id: "nikos-c",
-                name: "Nikos",
-                surname: "Christou",
-                age: 16,
-                gender: "male",
-                committee: "Legal Committee",
-                post: "Delegate",
-                interests: "Global politics, Sports, Friendly competition, Debates",
-                image: "https://placehold.co/300x300/c4b5fd/ffffff?text=Nikos"
-            },
-             {
-                id: "konstantinos-p",
-                name: "Konstantinos",
-                surname: "Pappas",
-                age: 16,
-                gender: "male",
-                committee: "Security Council",
-                post: "Delegate",
-                interests: "International law, Historical documentaries, Chess",
-                image: "https://placehold.co/300x300/a78bfa/ffffff?text=Konstantinos"
-            }
-        ];
+        // Removed hardcoded profiles array
 
         let currentProfileIndex = 0; // Tracks the current index within the *filtered* profiles
         let filteredProfiles = []; // Stores profiles based on the current gender filter
@@ -463,13 +289,39 @@
         const SWIPE_THRESHOLD = 75; // Minimum pixels to register a swipe
 
         /**
+         * Fetches all delegate profiles from Firestore.
+         */
+        async function fetchAllDelegates() {
+            showLoading("Fetching delegate profiles...");
+            allDelegates = []; // Clear previous delegates
+            try {
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                // Corrected path to include 'data' document to make segments odd
+                const delegatesCollectionRef = collection(db, `artifacts/${appId}/public/data/delegates`);
+                const querySnapshot = await getDocs(delegatesCollectionRef);
+
+                querySnapshot.forEach((doc) => {
+                    allDelegates.push(doc.data());
+                });
+                console.log("Fetched delegates:", allDelegates);
+            } catch (error) {
+                console.error("Error fetching delegates:", error);
+                showAlert("Error", "Could not load delegate profiles. Please ensure rules are correct.");
+            } finally {
+                hideLoading();
+            }
+        }
+
+        /**
          * Filters the main profiles array based on the selected gender.
          */
         function applyGenderFilter() {
-            if (currentFilterGender === 'all') {
-                filteredProfiles = [...profiles]; // Copy all profiles
+            if (allDelegates.length === 0) {
+                filteredProfiles = [];
+            } else if (currentFilterGender === 'all') {
+                filteredProfiles = [...allDelegates]; // Use fetched delegates
             } else {
-                filteredProfiles = profiles.filter(profile => profile.gender === currentFilterGender);
+                filteredProfiles = allDelegates.filter(profile => profile.gender === currentFilterGender);
             }
             currentProfileIndex = 0; // Reset index when filter changes
             loadNextProfile(); // Load the first profile of the new filtered list
@@ -487,7 +339,7 @@
                 profileAge.textContent = "";
                 profileCommittee.textContent = "";
                 profilePost.textContent = "";
-                profileBio.textContent = "Try changing your filter or check back later.";
+                profileBio.textContent = "No delegates found. Nominate someone or try changing your filter.";
                 voteBestDelegateButton.disabled = true;
                 voteCongenialityButton.disabled = true;
                 nextProfileButton.disabled = true; // Disable next button too
@@ -497,7 +349,7 @@
             profileImage.alt = `${profile.name} Profile`;
             profileName.textContent = `${profile.name} ${profile.surname}`;
             profileAge.textContent = `${profile.age} years old`;
-            profileCommittee.textContent = `Committee: ${profile.committee}`;
+            profileCommittee.textContent = `Committee: ${profile.committee || 'N/A'}`; // Display N/A if blank
             profilePost.textContent = `Post: ${profile.post}`;
             profileBio.textContent = `Interests: ${profile.interests}`;
 
@@ -576,7 +428,7 @@
                 console.warn("User ID not available to fetch votes.");
                 return;
             }
-            showLoading();
+            showLoading("Loading your previous votes...");
             votedProfiles = {}; // Reset previous votes
             try {
                 // Ensure __app_id is defined. If running outside Canvas, provide a fallback.
@@ -631,7 +483,7 @@
                 return;
             }
 
-            showLoading();
+            showLoading("Recording vote...");
             try {
                 // Ensure __app_id is defined. If running outside Canvas, provide a fallback.
                 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -721,6 +573,7 @@
          * Initial load function called after Firebase Auth is ready.
          */
         async function loadProfilesAndDisplayFirst() {
+            await fetchAllDelegates(); // Fetch all delegates from Firestore
             await fetchUserVotes(); // Fetch user's previous votes
             applyGenderFilter(); // Apply initial filter and display first profile
         }
@@ -728,7 +581,6 @@
         // Initial setup when the DOM is fully loaded.
         // The actual profile loading will wait for onAuthStateChanged to complete.
         document.addEventListener('DOMContentLoaded', () => {
-            // Ensure Firebase is initialized and user is authenticated before loading profiles
             // The onAuthStateChanged listener will handle calling loadProfilesAndDisplayFirst
         });
     </script>
