@@ -13,10 +13,10 @@
             background: linear-gradient(to right bottom, #a78bfa, #fbcfe8); /* Playful gradient background */
             display: flex;
             justify-content: center;
-            /* Removed align-items: center; to allow content to start from top if needed */
-            /* Removed min-height: 100vh; to allow body to expand with content */
+            align-items: center; /* Center vertically if content is shorter than screen */
+            min-height: 100vh; /* Ensure body takes full viewport height */
             margin: 0;
-            padding: 0; /* Removed padding to allow app-container to fill space */
+            padding: 10px; /* Add back padding to body for overall spacing */
             box-sizing: border-box;
             overflow-x: hidden; /* Prevent horizontal scrolling during swipe */
         }
@@ -116,6 +116,15 @@
             background-color: #8b5cf6; /* Purple-500 */
         }
 
+        /* New CSS for the app-container to handle scrolling */
+        .app-container-scrollable {
+            max-height: calc(100vh - 20px); /* Account for body padding of 10px top + 10px bottom */
+            overflow-y: auto;
+            /* Added some margin to ensure it doesn't touch screen edges too tightly */
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
     </style>
 </head>
 <body class="selection:bg-purple-200 selection:text-purple-800">
@@ -134,7 +143,8 @@
         </div>
     </div>
 
-    <div class="app-container bg-white p-4 sm:p-8 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm transform transition-all duration-300 hover:scale-105" style="max-height: 100vh; overflow-y: auto; margin-top: 10px; margin-bottom: 10px;">
+    <!-- Added app-container-scrollable class to the main container -->
+    <div class="app-container bg-white p-4 sm:p-8 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm transform transition-all duration-300 hover:scale-105 app-container-scrollable">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-purple-700 mb-6 drop-shadow-md">PyleaMUN Ballot</h1>
         <p class="text-center text-gray-600 mb-8 text-sm">Vote for your favorite delegates!</p>
 
