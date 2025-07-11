@@ -116,13 +116,30 @@
             background-color: #8b5cf6; /* Purple-500 */
         }
 
-        /* New CSS for the app-container to handle scrolling */
+        /* Revised CSS for the app-container to handle scrolling */
         .app-container-scrollable {
-            max-height: calc(100vh - 20px); /* Account for body padding of 10px top + 10px bottom */
+            /* Use flex-grow to allow it to take available space */
+            flex-grow: 1; 
+            max-height: calc(100vh - 20px); /* Account for body padding */
             overflow-y: auto;
-            /* Added some margin to ensure it doesn't touch screen edges too tightly */
-            margin-top: 10px;
-            margin-bottom: 10px;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            padding-bottom: 20px; /* Add extra padding at the bottom for content visibility */
+        }
+
+        /* Adjust font size for vote buttons */
+        #vote-best-delegate-button, #vote-congeniality-button {
+            font-size: 0.9rem; /* Smaller font size */
+            padding: 0.6rem 1rem; /* Adjust padding to fit new font size */
+        }
+        #vote-best-delegate-button span, #vote-congeniality-button span {
+            font-size: 1.5rem; /* Keep emoji larger */
+        }
+
+        /* Adjust button spacing for smaller screens if needed */
+        @media (max-width: 640px) { /* Tailwind's sm breakpoint */
+            #vote-best-delegate-button, #vote-congeniality-button {
+                padding: 0.5rem 0.75rem;
+            }
         }
 
     </style>
