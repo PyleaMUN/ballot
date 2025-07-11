@@ -229,11 +229,11 @@
         // The __firebase_config and __initial_auth_token are for the Canvas environment only.
         const firebaseConfig = {
             apiKey: "AIzaSyC3lYcRp_szMeI4AAeJHSK1UE68MfbMdyY", // THIS SHOULD BE YOUR ORIGINAL PROJECT'S API KEY
-            authDomain: "pyleamun-voting-app.firebaseapp.com", // THIS SHOULD BE YOUR ORIGINAL PROJECT'S AUTH DOMAIN
-            projectId: "pyleamun-voting-app", // THIS SHOULD BE YOUR ORIGINAL PROJECT'S ID
-            storageBucket: "pyleamun-voting-app.appspot.com", // THIS SHOULD BE YOUR ORIGINAL PROJECT'S STORAGE BUCKET
-            messagingSenderId: "519620537793", // THIS SHOULD BE YOUR ORIGINAL PROJECT'S SENDER ID
-            appId: "1:519620537793:web:d20dda66fded4c18e11340", // THIS SHOULD BE YOUR ORIGINAL PROJECT'S APP ID
+            authDomain: "pyleamun-voting-app.firebaseapp.com",
+            projectId: "pyleamun-voting-app",
+            storageBucket: "pyleamun-voting-app.appspot.com", // Corrected storageBucket for original project
+            messagingSenderId: "519620537793",
+            appId: "1:519620537793:web:d20dda66fded4c18e11340",
             measurementId: "G-95R9GTMPLH" // Only if you enabled Google Analytics, otherwise remove
         };
 
@@ -517,14 +517,6 @@
                 showAlert("Error", "No profile selected for voting.");
                 return;
             }
-
-            // Removed the restriction on voting for Student Officers or Executives
-            // The previous code had:
-            // if (currentProfile.post === 'Student Officer' || currentProfile.post === 'Executive') {
-            //     showAlert("Cannot Vote", `You cannot vote for ${currentProfile.post}s in this category.`);
-            //     loadNextProfile(); // Move to next profile
-            //     return;
-            // }
 
             // Check if already voted for this profile and type
             if (votedProfiles[currentProfile.id]?.[voteType]) {
