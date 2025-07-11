@@ -13,10 +13,10 @@
             background: linear-gradient(to right bottom, #a78bfa, #fbcfe8); /* Playful gradient background */
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            /* Removed align-items: center; to allow content to start from top if needed */
+            /* Removed min-height: 100vh; to allow body to expand with content */
             margin: 0;
-            padding: 10px; /* Reduced padding for very small screens */
+            padding: 0; /* Removed padding to allow app-container to fill space */
             box-sizing: border-box;
             overflow-x: hidden; /* Prevent horizontal scrolling during swipe */
         }
@@ -134,7 +134,7 @@
         </div>
     </div>
 
-    <div class="app-container bg-white p-4 sm:p-8 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm transform transition-all duration-300 hover:scale-105">
+    <div class="app-container bg-white p-4 sm:p-8 rounded-3xl shadow-2xl w-full max-w-xs sm:max-w-sm transform transition-all duration-300 hover:scale-105" style="max-height: 100vh; overflow-y: auto; margin-top: 10px; margin-bottom: 10px;">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-center text-purple-700 mb-6 drop-shadow-md">PyleaMUN Ballot</h1>
         <p class="text-center text-gray-600 mb-8 text-sm">Vote for your favorite delegates!</p>
 
@@ -471,6 +471,13 @@
             const currentProfile = filteredProfiles[currentProfileIndex];
             if (!currentProfile) {
                 showAlert("Error", "No profile selected for voting.");
+                return;
+            }
+
+            // Check if the current profile is a Student Officer or Executive
+            if (currentProfile.post === 'Student Officer' || currentProfile.post === 'Executive') {
+                showAlert("Cannot Vote", `You cannot vote for ${currentProfile.post}s in this category.`);
+                loadNextProfile(); // Move to next profile
                 return;
             }
 
