@@ -14,7 +14,7 @@
             margin: 0;
             padding: 0; /* Remove padding from body to ensure app-container can take full height */
             box-sizing: border-box;
-            overflow-x: hidden; /* Prevent horizontal scrolling */
+            overflow-x: hidden; /* Prevent horizontal scrolling during swipe */
             height: 100vh; /* Ensure body takes full viewport height */
             overflow-y: auto; /* Make the body itself scrollable */
             -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
@@ -33,7 +33,7 @@
         ::-webkit-scrollbar-thumb {
             background: #a78bfa;
             border-radius: 10px;
-            cursor: grab;
+            cursor: grab; /* Indicate it's draggable */
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #8b5cf6;
@@ -52,14 +52,14 @@
             align-items: center;
             z-index: 1000;
             font-size: 1.5rem;
-            color: #6d28d9;
+            color: #6d28d9; /* Purple-700 */
             flex-direction: column;
             gap: 1rem;
         }
 
         .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #a78bfa;
+            border: 4px solid #f3f3f3; /* Light grey */
+            border-top: 4px solid #a78bfa; /* Purple-400 */
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -97,16 +97,16 @@
         .custom-alert-box h3 {
             font-size: 1.5rem;
             font-weight: bold;
-            color: #6d28d9;
+            color: #6d28d9; /* Purple-700 */
             margin-bottom: 1rem;
         }
         .custom-alert-box p {
             font-size: 1rem;
-            color: #4b5563;
+            color: #4b5563; /* Gray-700 */
             margin-bottom: 1.5rem;
         }
         .custom-alert-box button {
-            background-color: #a78bfa;
+            background-color: #a78bfa; /* Purple-400 */
             color: white;
             padding: 0.75rem 1.5rem;
             border-radius: 0.5rem;
@@ -115,13 +115,13 @@
             cursor: pointer;
         }
         .custom-alert-box button:hover {
-            background-color: #8b5cf6;
+            background-color: #8b5cf6; /* Purple-500 */
         }
 
         /* Adjusted app-container to be centered within the scrollable body */
         .app-container {
             margin: 20px auto; /* Add vertical margin and center horizontally */
-            /* max-width and padding are handled by Tailwind classes */
+            /* Removed max-height and overflow-y from here, body handles it now */
         }
 
         /* Adjust font size for vote buttons */
@@ -224,17 +224,15 @@
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
-        // Use the hardcoded firebaseConfig for local testing.
-        // The __firebase_config and __initial_auth_token are for the Canvas environment only.
+        // Your web app's Firebase configuration (PASTE YOUR SNIPPET HERE)
         const firebaseConfig = {
-            apiKey: "AIzaSyC3lYcRp_szMeI4AAeJHSK1UE68MfbMdyY", // THIS SHOULD BE YOUR ORIGINAL PROJECT'S API KEY
+            apiKey: "AIzaSyC3lYcRp_szMeI4AAeJHSK1UE68MfbMdyY", // Corrected API Key
             authDomain: "pyleamun-voting-app.firebaseapp.com",
             projectId: "pyleamun-voting-app",
-            storageBucket: "pyleamun-voting-app.appspot.com", // Corrected storageBucket for original project
+            storageBucket: "pyleamun-voting-app.firebasestorage.app",
             messagingSenderId: "519620537793",
             appId: "1:519620537793:web:d20dda66fded4c18e11340",
-            measurementId: "G-95R9GTMPLH" // Only if you enabled Google Analytics, otherwise remove
+            measurementId: "G-95R9GTMPLH"
         };
 
         // Initialize Firebase
@@ -269,40 +267,26 @@
         });
 
         // --- Firebase Authentication ---
-        // This function will be called to try and sign in anonymously
-        async function initializeAuthAndLoadData() {
-            try {
-                // For local testing, we directly sign in anonymously.
-                // __initial_auth_token is only available in the Canvas environment.
-                await signInAnonymously(auth);
-                console.log("Signed in anonymously.");
-            } catch (error) {
-                console.error("Authentication failed:", error);
-                showAlert("Authentication Error", "Could not sign you in. Please try again.");
-            }
-        }
-
-        // Listen for auth state changes to get the user ID and load data
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                // User is signed in (either new anonymous or existing)
                 currentUserId = user.uid;
                 console.log("User signed in:", currentUserId);
                 // Now that we have a user, we can load profiles
                 loadProfilesAndDisplayFirst();
             } else {
-                // If user is signed out, and it's not due to an explicit sign-out,
-                // try to sign in anonymously. This handles initial load or session expiry.
-                // Only attempt anonymous sign-in if no current user object exists in auth
-                if (!auth.currentUser) { 
-                    console.log("No user signed in. Attempting anonymous sign-in...");
-                    initializeAuthAndLoadData(); // Re-attempt sign-in
-                } else {
-                    console.log("User signed out.");
-                    currentUserId = null; // Clear user ID
-                }
+                // User is signed out, sign in anonymously
+                console.log("No user signed in. Signing in anonymously...");
+                signInAnonymously(auth)
+                    .then(() => {
+                        console.log("Anonymous sign-in successful.");
+                    })
+                    .catch((error) => {
+                        console.error("Anonymous sign-in failed:", error);
+                        showAlert("Authentication Error", "Could not sign you in. Please try again.");
+                    });
             }
         });
-
 
         let currentProfileIndex = 0; // Tracks the current index within the *filtered* profiles
         let filteredProfiles = []; // Stores profiles based on the current gender filter
@@ -335,9 +319,7 @@
             showLoading("Fetching delegate profiles...");
             allDelegates = []; // Clear previous delegates
             try {
-                // For local testing, use firebaseConfig.projectId directly as __app_id is undefined
-                const appId = firebaseConfig.projectId;
-
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                 // Corrected path to include 'data' document to make segments odd
                 const delegatesCollectionRef = collection(db, `artifacts/${appId}/public/data/delegates`);
                 const querySnapshot = await getDocs(delegatesCollectionRef);
@@ -473,8 +455,8 @@
             showLoading("Loading your previous votes...");
             votedProfiles = {}; // Reset previous votes
             try {
-                // For local testing, use firebaseConfig.projectId directly as __app_id is undefined
-                const appId = firebaseConfig.projectId;
+                // Ensure __app_id is defined. If running outside Canvas, provide a fallback.
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                 const votesCollectionRef = collection(db, `artifacts/${appId}/users/${currentUserId}/votes`);
                 const q = query(votesCollectionRef);
                 const querySnapshot = await getDocs(q);
@@ -518,6 +500,13 @@
                 return;
             }
 
+            // Check if the current profile is a Student Officer or Executive
+            if (currentProfile.post === 'Student Officer' || currentProfile.post === 'Executive') {
+                showAlert("Cannot Vote", `You cannot vote for ${currentProfile.post}s in this category.`);
+                loadNextProfile(); // Move to next profile
+                return;
+            }
+
             // Check if already voted for this profile and type
             if (votedProfiles[currentProfile.id]?.[voteType]) {
                 showMessage(`You already voted for ${currentProfile.name} as ${voteType === 'bestDelegate' ? 'Best Delegate (Delegate\'s Choice)' : 'Mr./Ms. Congeniality'}!`, 'info');
@@ -527,8 +516,8 @@
 
             showLoading("Recording vote...");
             try {
-                // For local testing, use firebaseConfig.projectId directly as __app_id is undefined
-                const appId = firebaseConfig.projectId;
+                // Ensure __app_id is defined. If running outside Canvas, provide a fallback.
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
                 // Record the vote in the user's private collection
                 const userVotesCollectionRef = collection(db, `artifacts/${appId}/users/${currentUserId}/votes`);
                 await addDoc(userVotesCollectionRef, {
@@ -584,9 +573,9 @@
         }
 
         // Initial setup when the DOM is fully loaded.
+        // The actual profile loading will wait for onAuthStateChanged to complete.
         document.addEventListener('DOMContentLoaded', () => {
-            // Call the authentication initialization function
-            initializeAuthAndLoadData();
+            // The onAuthStateChanged listener will handle calling loadProfilesAndDisplayFirst
         });
     </script>
 </body>
